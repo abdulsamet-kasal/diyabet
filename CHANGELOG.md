@@ -15,3 +15,4 @@ Tüm önemli değişiklikler bu dosyada kronolojik olarak listelenir.
 - Faz 4: Besin modülü (canlı SQLite FTS arama, detay ekranı, GI/GL çarpanları, etiket ekleme sihirbazı ve barkod akışı) tamamlandı.
 - Faz 5: Öğün oluşturucu tabak ekranı, reşitlik ve tip profili güvenlik kilidi, IOB düşümlü doz hesaplama, formül dökümü ve salt ekleme (append-only) kütük kaydı tamamlandı.
 - Faz 6: Glikoz günlüğü, Time-in-Range (TIR) hesaplayıcı ve hekim için profesyonel PDF klinik rapor dışa aktarma modülü tamamlandı.
+- Faz 7: Hipoglisemi acil yardım kartı (15-15 kuralı sayacı, 112 doğrudan arama, acil yakını hızlı arama, glukagon talimatı), 8 makalelik klinik eğitim modülü (taslak banner ve resmi kılavuz atıfları) ve yerel ölçüm/enjeksiyon hatırlatıcıları tamamlandı.

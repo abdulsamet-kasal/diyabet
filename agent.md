@@ -24,7 +24,7 @@ Bu dosya, projede gerçekleştirilen tüm geliştirme adımlarını, fazları, t
 | **Faz 4** | Besin Modülü (Arama/FTS, Detay, Porsiyonlar, Barkod, Doğrulama) | 🟢 Tamamlandı | Canlı arama, porsiyon/GI-GL hesabı, etiket ekleme ve barkod akışı tamamlandı | `faz-4: food-module` |
 | **Faz 5** | Öğün Oluşturucu + Doz Hesaplama Ekranı & Doz Logu | 🟢 Tamamlandı | Tabak yönetimi, profil kilidi, IOB düşümü, append-only loglama ve widget testleri yeşil | `faz-5: meal-dose` |
 | **Faz 6** | Glikoz Günlüğü + Raporlar (PDF Dokümanı) | 🟢 Tamamlandı | Canlı ölçüm kaydı, Time-in-Range hesabı, Hekim PDF raporu oluşturma ve testler yeşil | `faz-6: glucose-reports` |
-| **Faz 7** | Eğitim İçeriği + Acil Durum (Hipoglisemi Kartı) + Hatırlatıcılar | ⚪ Bekliyor | - | - |
+| **Faz 7** | Eğitim İçeriği + Acil Durum (Hipoglisemi Kartı) + Hatırlatıcılar | 🟢 Tamamlandı | 21 testin tamamı yeşil, analyze 0 hata | `faz-7: education-emergency-reminders` |
 | **Faz 8** | Supabase Senkronizasyon + KVKK / Gizlilik + Biyometrik Kilit | ⚪ Bekliyor | - | - |
 | **Faz 9** | Sertleştirme, Erişilebilirlik, Testler & APK Derleme/Yayınlama | ⚪ Bekliyor | - | - |
 
@@ -152,3 +152,33 @@ Bu dosya, projede gerçekleştirilen tüm geliştirme adımlarını, fazları, t
   - Test Sonuçları:
     - `pdf_report_test.dart` ile PDF byte üretimi başarıyla doğrulandı.
     - 15 mobil test %100 yeşil, `flutter analyze` 0 hata.
+
+### [Faz 7] - Eğitim İçeriği, Acil Durum & Hatırlatıcılar
+- **Tarih:** 2026-10-01
+- **Yapılanlar:**
+  - `EmergencyScreen` geliştirmeleri:
+    - `url_launcher` ile doğrudan `tel:112` acil arama butonu entegrasyonu.
+    - Kullanıcının kendi acil yakını/doktorunu tanımlayabilmesi (`SharedPreferences`) ve tek tıkla arayabilmesi.
+    - Haptik geri bildirim (`HapticFeedback`) desteği (sayaç başlangıcı, sıfırlama, bitiş alarmı ve acil arama).
+    - Bilinç kaybı ve koma durumunda hasta yakınları için Glukagon kiti ve kurtarma pozisyonu (koma pozisyonu) rehberi.
+  - Eğitim Modülü (`apps/mobile/lib/features/education/`):
+    - `EducationArticle` ve `EducationArticlesData` ile 8 temel klinik konuda kapsamlı Türkçe eğitim seti:
+      - 15-15 Kuralı ile Hipoglisemi Yönetimi
+      - Karbonhidrat Sayımı Temelleri & 15g Değişim
+      - İnsülin Saklama ve Enjeksiyon Bölge Rotasyonu (Lipohipertrofiyi Önleme)
+      - Hiperglisemi ve Keton Yönetimi (DKA Uyarısı)
+      - Hasta Günleri Rehberi (Sick-Day Rules)
+      - Egzersiz, İnsülin ve Hipoglisemi Koruması
+      - Tabak Yöntemi (Plate Method) ile Sağlıklı Beslenme
+      - Besin Etiketi Okuma ve Gizli Şekerler
+    - Her makalede klinik onay yapılana kadar zorunlu "TASLAK – Klinik Gözden Geçirme Bekliyor" sarı uyarı kartı ve resmi kaynak rehberleri (TEMD, ADA, IDF, TÜBER).
+    - `ArticleDetailScreen` ve `EducationScreen` arama filtresi.
+  - Hatırlatıcılar Modülü (`apps/mobile/lib/features/reminders/`):
+    - Riverpod modern `NotifierProvider` mimarisi (`ReminderNotifier`).
+    - `SharedPreferences` tabanlı kalıcı saklama.
+    - Sabah açlık ölçümü, gece bazal insülin ve yemekten 2 saat sonrasına tokluk şekeri kontrolü desteği.
+    - `RemindersScreen` arayüzü ve `HomeScreen` hızlı erişim kartı.
+  - Test Sonuçları:
+    - `phase7_test.dart` ile 6 yeni test yazıldı.
+    - Toplam 21 mobil test %100 yeşil.
+    - `flutter analyze` 0 hata/uyarı (Flutter 3.47+ deprecation temiz).

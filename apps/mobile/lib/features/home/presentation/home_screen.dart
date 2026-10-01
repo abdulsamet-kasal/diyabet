@@ -115,6 +115,12 @@ class HomeScreen extends StatelessWidget {
                   subtitle: 'Diyabet bilgileri',
                   onTap: () => context.push('/education'),
                 ),
+                _QuickActionCard(
+                  icon: Icons.alarm,
+                  title: 'Hatırlatıcılar',
+                  subtitle: 'Ölçüm & Enjeksiyon',
+                  onTap: () => context.push('/reminders'),
+                ),
               ],
             ),
           ],

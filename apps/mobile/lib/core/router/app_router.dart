@@ -8,6 +8,7 @@ import '../../features/glucose_log/presentation/glucose_log_screen.dart';
 import '../../features/history_reports/presentation/reports_screen.dart';
 import '../../features/emergency/presentation/emergency_screen.dart';
 import '../../features/education/presentation/education_screen.dart';
+import '../../features/reminders/presentation/reminders_screen.dart';
 import '../../features/profile_settings/presentation/settings_screen.dart';
 
 final appRouter = GoRouter(
@@ -48,6 +49,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/education',
       builder: (context, state) => const EducationScreen(),
+    ),
+    GoRoute(
+      path: '/reminders',
+      builder: (context, state) => const RemindersScreen(),
     ),
     GoRoute(
       path: '/settings',
