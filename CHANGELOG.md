@@ -12,3 +12,4 @@ Tüm önemli değişiklikler bu dosyada kronolojik olarak listelenir.
 - Faz 2: Supabase şeması, salt ekleme (append-only) RLS politikaları, Edge Function barkod proxy ve Python besin kalite kontrol script'leri hazırlandı.
 - Mobil çevrimdışı Drift SQLite veritabanı, Türkçe normalizasyonlu gıda arama ve repository katmanı entegre edildi.
 - Faz 3: WCAG AA erişilebilir bileşenler (GlucoseChip, CarbBadge, VerificationBadge, WarningBanner, NumericField, DoseResultCard), modern Riverpod NotifierProvider durum yönetimi, Stepper Onboarding ve Terapi Ayar sihirbazı tamamlandı.
+- Faz 4: Besin modülü (canlı SQLite FTS arama, detay ekranı, GI/GL çarpanları, etiket ekleme sihirbazı ve barkod akışı) tamamlandı.

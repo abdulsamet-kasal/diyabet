@@ -21,7 +21,7 @@ Bu dosya, projede gerçekleştirilen tüm geliştirme adımlarını, fazları, t
 | **Faz 1** | Doz Motoru (`packages/dose_engine` saf Dart, %100 test kapsamı, 10 klinik vaka) | 🟢 Tamamlandı | 27 testin tamamı yeşil, analyze 0 hata | `faz-1: dose-engine` |
 | **Faz 2** | Veri Katmanı (Supabase şeması, Drift yerel DB, Import pipeline, Kalite kontrolleri) | 🟢 Tamamlandı | Drift SQLite, RLS, Python validator ve repo testleri %100 | `faz-2: data-layer` |
 | **Faz 3** | Tasarım Sistemi + Onboarding + Terapi Ayarları | 🟢 Tamamlandı | Tüm WCAG AA bileşenleri, Riverpod NotifierProvider ve testler yeşil | `faz-3: design-onboarding` |
-| **Faz 4** | Besin Modülü (Arama/FTS, Detay, Porsiyonlar, Barkod, Doğrulama) | ⚪ Bekliyor | - | - |
+| **Faz 4** | Besin Modülü (Arama/FTS, Detay, Porsiyonlar, Barkod, Doğrulama) | 🟢 Tamamlandı | Canlı arama, porsiyon/GI-GL hesabı, etiket ekleme ve barkod akışı tamamlandı | `faz-4: food-module` |
 | **Faz 5** | Öğün Oluşturucu + Doz Hesaplama Ekranı & Doz Logu | ⚪ Bekliyor | - | - |
 | **Faz 6** | Glikoz Günlüğü + Raporlar (PDF Dokümanı) | ⚪ Bekliyor | - | - |
 | **Faz 7** | Eğitim İçeriği + Acil Durum (Hipoglisemi Kartı) + Hatırlatıcılar | ⚪ Bekliyor | - | - |
@@ -103,3 +103,14 @@ Bu dosya, projede gerçekleştirilen tüm geliştirme adımlarını, fazları, t
   - Test Sonuçları:
     - `design_system_test.dart` ve `repository_test.dart` dahil 12 mobil test %100 yeşil.
     - `flutter analyze` 0 hata.
+
+### [Faz 4] - Besin Modülü
+- **Tarih:** 2026-10-01
+- **Yapılanlar:**
+  - `plateProvider` (Öğün tabağı durum yönetimi, toplam karb ve 15g değişim birimi hesabı).
+  - `FoodSearchScreen` (Canlı SQLite araması, Türkçe normalizasyon, kategori çipleri, barkod diyalogu).
+  - `FoodDetailScreen` (100g ve porsiyon çarpanları, GI ve Glisemik Yük (GL) formülü `(GI * karb)/100`, tabağa ekleme).
+  - `AddFoodScreen` (Paket etiketinden elle besin ekleme, `sugars <= carbs`, `fiber <= carbs` kalite kontrolleri, `user_entered` doğrulaması).
+  - Test Sonuçları:
+    - `flutter analyze` 0 hata.
+    - Tüm testler yeşil.
