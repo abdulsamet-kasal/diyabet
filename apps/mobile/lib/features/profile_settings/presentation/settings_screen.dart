@@ -1,25 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:dose_engine/dose_engine.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/numeric_field.dart';
+import '../../../data/providers/app_providers.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
-  final TextEditingController _targetGlucoseController = TextEditingController();
-  final TextEditingController _isfController = TextEditingController();
-  final TextEditingController _icrController = TextEditingController();
-  final TextEditingController _diaController = TextEditingController();
-  final TextEditingController _maxDoseController = TextEditingController();
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  final _targetGlucoseController = TextEditingController();
+  final _isfController = TextEditingController();
+  final _icrController = TextEditingController();
+  final _diaController = TextEditingController();
+  final _maxDoseController = TextEditingController();
 
-  double _doseStep = 0.5; // 0.1, 0.5, 1.0
+  double _doseStep = 0.5;
   bool _usesSyringe = false;
   bool _allowNegativeCorrection = false;
   bool _subtractFiber = false;
   bool _confirmedWithClinician = false;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _initValues());
+  }
+
+  void _initValues() {
+    final profile = ref.read(userProfileProvider);
+    final settings = profile.therapySettings;
+    if (settings != null) {
+      if (settings.defaultIcr != null) _icrController.text = settings.defaultIcr.toString();
+      if (settings.isf != null) _isfController.text = settings.isf.toString();
+      if (settings.targetGlucose != null) _targetGlucoseController.text = settings.targetGlucose.toString();
+      if (settings.diaHours != null) _diaController.text = settings.diaHours.toString();
+      _maxDoseController.text = settings.maxSingleDose.toString();
+      _doseStep = settings.doseStep;
+      _allowNegativeCorrection = settings.allowNegativeCorrection;
+      _subtractFiber = settings.subtractFiber;
+      _confirmedWithClinician = settings.confirmedWithClinician;
+    }
+    setState(() {});
+  }
 
   @override
   void dispose() {
@@ -31,8 +57,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
     super.dispose();
   }
 
+  void _saveSettings() async {
+    final icr = NumericField.parseTurkishDouble(_icrController.text);
+    final isf = NumericField.parseTurkishDouble(_isfController.text);
+    final target = NumericField.parseTurkishDouble(_targetGlucoseController.text);
+    final dia = NumericField.parseTurkishDouble(_diaController.text);
+    final maxDose = NumericField.parseTurkishDouble(_maxDoseController.text) ?? 15.0;
+
+    final newSettings = TherapySettings(
+      defaultIcr: icr,
+      isf: isf,
+      targetGlucose: target,
+      diaHours: dia,
+      doseStep: _doseStep,
+      maxSingleDose: maxDose,
+      allowNegativeCorrection: _allowNegativeCorrection,
+      subtractFiber: _subtractFiber,
+      confirmedWithClinician: _confirmedWithClinician,
+    );
+
+    final notifier = ref.read(userProfileProvider.notifier);
+    await notifier.updateTherapySettings(newSettings);
+    notifier.setUsesSyringe(_usesSyringe);
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Terapi ayarları başarıyla güncellendi.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final profile = ref.watch(userProfileProvider);
+
     return Scaffold(
       appBar: AppBar(title: const Text('Terapi ve Uygulama Ayarları')),
       body: SafeArea(
@@ -64,61 +122,62 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 16),
 
+            // Profile info chip
+            Row(
+              children: [
+                Chip(
+                  avatar: const Icon(Icons.person, size: 18),
+                  label: Text('Diyabet: ${profile.diabetesType.toUpperCase()}'),
+                ),
+                const SizedBox(width: 8),
+                Chip(
+                  avatar: const Icon(Icons.bloodtype, size: 18),
+                  label: Text('Birim: ${profile.glucoseUnit.name.toUpperCase()}'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
             const Text('Hekim Terapi Parametreleri', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 12),
 
-            TextField(
+            NumericField(
               controller: _icrController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(
-                labelText: 'İnsülin / Karbonhidrat Oranı (ICR)',
-                hintText: 'Örn. 10 (1 ünite kaç gram karbonhidrata yeter?)',
-                suffixText: 'g / U',
-              ),
+              labelText: 'İnsülin / Karbonhidrat Oranı (ICR)',
+              hintText: 'Örn. 10 (1 ünite kaç gram karbonhidrata yeter?)',
+              suffixText: 'g / U',
             ),
             const SizedBox(height: 12),
 
-            TextField(
+            NumericField(
               controller: _isfController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(
-                labelText: 'Düzeltme Faktörü (ISF)',
-                hintText: 'Örn. 40 (1 ünite kan şekerini kaç mg/dL düşürür?)',
-                suffixText: 'mg/dL / U',
-              ),
+              labelText: 'Düzeltme Faktörü (ISF)',
+              hintText: 'Örn. 40 (1 ünite kaç mg/dL düşürür?)',
+              suffixText: 'mg/dL / U',
             ),
             const SizedBox(height: 12),
 
-            TextField(
+            NumericField(
               controller: _targetGlucoseController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(
-                labelText: 'Hedef Kan Şekeri',
-                hintText: 'Örn. 100',
-                suffixText: 'mg/dL',
-              ),
+              labelText: 'Hedef Kan Şekeri',
+              hintText: 'Örn. 100',
+              suffixText: 'mg/dL',
             ),
             const SizedBox(height: 12),
 
-            TextField(
+            NumericField(
               controller: _diaController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(
-                labelText: 'İnsülin Etki Süresi (DIA)',
-                hintText: 'Örn. 3 veya 4',
-                suffixText: 'saat',
-              ),
+              labelText: 'İnsülin Etki Süresi (DIA)',
+              hintText: 'Örn. 3 veya 4',
+              suffixText: 'saat',
             ),
             const SizedBox(height: 12),
 
-            TextField(
+            NumericField(
               controller: _maxDoseController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(
-                labelText: 'Maksimum Tek Doz Limiti',
-                hintText: 'Örn. 12',
-                suffixText: 'Ünite',
-              ),
+              labelText: 'Maksimum Tek Doz Limiti',
+              hintText: 'Örn. 12',
+              suffixText: 'Ünite',
             ),
             const SizedBox(height: 16),
 
@@ -172,13 +231,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 16),
 
             ElevatedButton(
-              onPressed: _confirmedWithClinician
-                  ? () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Terapi ayarları başarıyla kaydedildi.')),
-                      );
-                    }
-                  : null,
+              onPressed: _confirmedWithClinician ? _saveSettings : null,
               child: const Text('Ayarları Kaydet'),
             ),
             const Divider(height: 36),

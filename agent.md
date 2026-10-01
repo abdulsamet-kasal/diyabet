@@ -20,7 +20,7 @@ Bu dosya, projede gerçekleştirilen tüm geliştirme adımlarını, fazları, t
 | **Faz 0** | Plan ve İskelet (Mimari, Lint, CI, Dokümantasyon, L10n, Tema temeli) | 🟢 Tamamlandı | flutter analyze: 0 hata, testler: %100 yeşil | `faz-0: initial-skeleton` |
 | **Faz 1** | Doz Motoru (`packages/dose_engine` saf Dart, %100 test kapsamı, 10 klinik vaka) | 🟢 Tamamlandı | 27 testin tamamı yeşil, analyze 0 hata | `faz-1: dose-engine` |
 | **Faz 2** | Veri Katmanı (Supabase şeması, Drift yerel DB, Import pipeline, Kalite kontrolleri) | 🟢 Tamamlandı | Drift SQLite, RLS, Python validator ve repo testleri %100 | `faz-2: data-layer` |
-| **Faz 3** | Tasarım Sistemi + Onboarding + Terapi Ayarları | ⚪ Bekliyor | - | - |
+| **Faz 3** | Tasarım Sistemi + Onboarding + Terapi Ayarları | 🟢 Tamamlandı | Tüm WCAG AA bileşenleri, Riverpod NotifierProvider ve testler yeşil | `faz-3: design-onboarding` |
 | **Faz 4** | Besin Modülü (Arama/FTS, Detay, Porsiyonlar, Barkod, Doğrulama) | ⚪ Bekliyor | - | - |
 | **Faz 5** | Öğün Oluşturucu + Doz Hesaplama Ekranı & Doz Logu | ⚪ Bekliyor | - | - |
 | **Faz 6** | Glikoz Günlüğü + Raporlar (PDF Dokümanı) | ⚪ Bekliyor | - | - |
@@ -78,4 +78,28 @@ Bu dosya, projede gerçekleştirilen tüm geliştirme adımlarını, fazları, t
     - `DoseRepository` (append-only doz logu, IOB penceresi sorguları).
   - Test Sonuçları:
     - Repository in-memory SQLite testleri 5/5 geçti.
+    - `flutter analyze` 0 hata.
+
+### [Faz 3] - Tasarım Sistemi, Onboarding & Ayarlar
+- **Tarih:** 2026-10-01
+- **Yapılanlar:**
+  - WCAG AA Erişilebilirlik Bileşenleri geliştirildi:
+    - `GlucoseChip` (renk tek başına kullanılmaz; ikon + metin + değer ile ▼ Düşük / ● Hedefte / ▲ Yüksek gösterimi).
+    - `CarbBadge` (gram + Türkiye 15g değişim birimi karşılığı).
+    - `VerificationBadge` (resmi, etiket, kullanıcı, topluluk doğrulanmamış rozetleri).
+    - `WarningBanner` (info, warning, critical hiyerarşisi ve erişilebilir renk kontrastı).
+    - `NumericField` (Türkçe ondalık virgül desteği, sessiz 0 dönüşümü olmadan katı doğrulama).
+    - `DoseResultCard` (şeffaf formül adımları, U-100 şırınga mL karşılığı, hipoglisemi bloğu kartı).
+  - Durum Yönetimi (Riverpod):
+    - Kullanıcı kuralına uygun modern `NotifierProvider` mimarisi (`userProfileProvider`).
+    - Tip 1 / Tip 2 (insülinli) / Tip 2 (insülinsiz) profillerine göre doz hesaplayıcı yetkilendirmesi (`isDoseCalculatorAllowed`).
+  - Onboarding & Kurulum Sihirbazı (`OnboardingScreen`):
+    - Hukuki aydınlatma ve açık rıza kaydı.
+    - 18 yaş kontrolü (18 yaş altında doz hesaplayıcı kilitlenir).
+    - 4 farklı diyabet tipi seçimi.
+    - Hekim terapi ayarları sihirbazı (ICR, ISF, Hedef, DIA, Doz Adımı, Hekim teyidi).
+  - Ayarlar Ekranı (`SettingsScreen`):
+    - Versiyonlu terapi parametreleri düzenleme, şırınga mL seçimi, negatif düzeltme ve lif düşümü ayarları.
+  - Test Sonuçları:
+    - `design_system_test.dart` ve `repository_test.dart` dahil 12 mobil test %100 yeşil.
     - `flutter analyze` 0 hata.

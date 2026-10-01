@@ -11,3 +11,4 @@ Tüm önemli değişiklikler bu dosyada kronolojik olarak listelenir.
 - Hipoglisemi bloğu (< 70 mg/dL), muhafazakâr ortada aşağı yuvarlama, IOB düzeltme düşümü, üst sınır koruması uygulandı.
 - Faz 2: Supabase şeması, salt ekleme (append-only) RLS politikaları, Edge Function barkod proxy ve Python besin kalite kontrol script'leri hazırlandı.
 - Mobil çevrimdışı Drift SQLite veritabanı, Türkçe normalizasyonlu gıda arama ve repository katmanı entegre edildi.
+- Faz 3: WCAG AA erişilebilir bileşenler (GlucoseChip, CarbBadge, VerificationBadge, WarningBanner, NumericField, DoseResultCard), modern Riverpod NotifierProvider durum yönetimi, Stepper Onboarding ve Terapi Ayar sihirbazı tamamlandı.
