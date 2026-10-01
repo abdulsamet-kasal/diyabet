@@ -7,4 +7,5 @@ Tüm önemli değişiklikler bu dosyada kronolojik olarak listelenir.
 - Faz 0: Mimari plan (`PLAN.md`), varsayımlar (`ASSUMPTIONS.md`), açık sorular (`OPEN_QUESTIONS.md`) oluşturuldu.
 - Git deposu ve GitHub entegrasyonu sağlandı (`abdulsamet-kasal/diyabet`).
 - CachyOS 8GB RAM ve Gradle JVM sınırları (`android/gradle.properties`) tanımlandı.
-- Saf Dart doz motoru (`packages/dose_engine`) ve Flutter mobil uygulaması (`apps/mobile`) altyapısı hazırlandı.
+- Faz 1: `packages/dose_engine` saf Dart paketi ve 27 klinik test tamamlandı.
+- Hipoglisemi bloğu (< 70 mg/dL), muhafazakâr ortada aşağı yuvarlama, IOB düzeltme düşümü, üst sınır koruması uygulandı.
