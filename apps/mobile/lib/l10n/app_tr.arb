@@ -1,0 +1,17 @@
+{
+  "@@locale": "tr",
+  "appTitle": "GlikoRehber",
+  "disclaimerTitle": "Tıbbi Sorumluluk Reddi",
+  "disclaimerText": "GlikoRehber yalnızca bir hesaplama ve takip asistanıdır. Kesinlikle tıbbi tavsiye vermez. Önerilen insülin dozunu uygulamadan önce mutlaka hekiminizin veya diyabet eğitim hemşirenizin talimatlarıyla karşılaştırınız.",
+  "acceptAndContinue": "Okudum, Anladım ve Kabul Ediyorum",
+  "home": "Ana Sayfa",
+  "foods": "Besinler",
+  "plate": "Öğün Tabağı",
+  "doseCalculator": "Doz Hesapla",
+  "glucoseLog": "Glikoz Günlüğü",
+  "education": "Eğitim",
+  "emergency": "Acil Durum (15-15)",
+  "settings": "Ayarlar",
+  "hypoAlert": "DİKKAT: Hipoglisemi Riski! Doz hesaplanamaz.",
+  "hypoRule15": "15-15 Kuralını uygulayınız: 15g hızlı etkili karbonhidrat alıp 15 dakika sonra kan şekerinizi yeniden ölçünüz."
+}

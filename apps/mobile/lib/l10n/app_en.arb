@@ -1,0 +1,17 @@
+{
+  "@@locale": "en",
+  "appTitle": "GlikoRehber",
+  "disclaimerTitle": "Medical Disclaimer",
+  "disclaimerText": "GlikoRehber is only a calculation and tracking assistant. It does not provide medical advice. Always cross-check the suggested insulin dose with your physician or diabetes educator before injection.",
+  "acceptAndContinue": "I Have Read, Understood, and Accept",
+  "home": "Home",
+  "foods": "Foods",
+  "plate": "Meal Plate",
+  "doseCalculator": "Calculate Dose",
+  "glucoseLog": "Glucose Log",
+  "education": "Education",
+  "emergency": "Emergency (15-15)",
+  "settings": "Settings",
+  "hypoAlert": "WARNING: Hypoglycemia Risk! Dose calculation is blocked.",
+  "hypoRule15": "Follow the 15-15 Rule: Consume 15g fast-acting carbs and recheck blood glucose after 15 minutes."
+}
