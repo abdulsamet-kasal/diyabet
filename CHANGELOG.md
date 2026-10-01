@@ -13,3 +13,4 @@ Tüm önemli değişiklikler bu dosyada kronolojik olarak listelenir.
 - Mobil çevrimdışı Drift SQLite veritabanı, Türkçe normalizasyonlu gıda arama ve repository katmanı entegre edildi.
 - Faz 3: WCAG AA erişilebilir bileşenler (GlucoseChip, CarbBadge, VerificationBadge, WarningBanner, NumericField, DoseResultCard), modern Riverpod NotifierProvider durum yönetimi, Stepper Onboarding ve Terapi Ayar sihirbazı tamamlandı.
 - Faz 4: Besin modülü (canlı SQLite FTS arama, detay ekranı, GI/GL çarpanları, etiket ekleme sihirbazı ve barkod akışı) tamamlandı.
+- Faz 5: Öğün oluşturucu tabak ekranı, reşitlik ve tip profili güvenlik kilidi, IOB düşümlü doz hesaplama, formül dökümü ve salt ekleme (append-only) kütük kaydı tamamlandı.

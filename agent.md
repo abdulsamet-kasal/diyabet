@@ -22,7 +22,7 @@ Bu dosya, projede gerçekleştirilen tüm geliştirme adımlarını, fazları, t
 | **Faz 2** | Veri Katmanı (Supabase şeması, Drift yerel DB, Import pipeline, Kalite kontrolleri) | 🟢 Tamamlandı | Drift SQLite, RLS, Python validator ve repo testleri %100 | `faz-2: data-layer` |
 | **Faz 3** | Tasarım Sistemi + Onboarding + Terapi Ayarları | 🟢 Tamamlandı | Tüm WCAG AA bileşenleri, Riverpod NotifierProvider ve testler yeşil | `faz-3: design-onboarding` |
 | **Faz 4** | Besin Modülü (Arama/FTS, Detay, Porsiyonlar, Barkod, Doğrulama) | 🟢 Tamamlandı | Canlı arama, porsiyon/GI-GL hesabı, etiket ekleme ve barkod akışı tamamlandı | `faz-4: food-module` |
-| **Faz 5** | Öğün Oluşturucu + Doz Hesaplama Ekranı & Doz Logu | ⚪ Bekliyor | - | - |
+| **Faz 5** | Öğün Oluşturucu + Doz Hesaplama Ekranı & Doz Logu | 🟢 Tamamlandı | Tabak yönetimi, profil kilidi, IOB düşümü, append-only loglama ve widget testleri yeşil | `faz-5: meal-dose` |
 | **Faz 6** | Glikoz Günlüğü + Raporlar (PDF Dokümanı) | ⚪ Bekliyor | - | - |
 | **Faz 7** | Eğitim İçeriği + Acil Durum (Hipoglisemi Kartı) + Hatırlatıcılar | ⚪ Bekliyor | - | - |
 | **Faz 8** | Supabase Senkronizasyon + KVKK / Gizlilik + Biyometrik Kilit | ⚪ Bekliyor | - | - |
@@ -114,3 +114,22 @@ Bu dosya, projede gerçekleştirilen tüm geliştirme adımlarını, fazları, t
   - Test Sonuçları:
     - `flutter analyze` 0 hata.
     - Tüm testler yeşil.
+
+### [Faz 5] - Öğün Oluşturucu & Doz Hesaplayıcı
+- **Tarih:** 2026-10-01
+- **Yapılanlar:**
+  - `MealBuilderScreen`:
+    - Tabaktaki besinlerin listelenmesi, tek tek silinmesi veya toplu temizlenmesi.
+    - Anlık toplam karbonhidrat ve Türkiye 15g değişim birimi özeti.
+    - Tek tıkla "Bu Öğün İçin Doz Hesapla" akışı.
+  - `DoseCalculatorScreen`:
+    - 18 yaş altı veya insülinsiz Tip 2 profillerinde doz hesaplama güvenlik kilidi (`isDoseCalculatorAllowed`).
+    - Tabaktan otomatik aktarılan karb değeri ve isteğe bağlı glikoz girişi.
+    - `DoseRepository` üzerinden son enjeksiyonların çekilip IOB (Aktif İnsülin) düşümünün yapılması.
+    - `packages/dose_engine` üzerinden saf matematiksel doz hesabı.
+    - `DoseResultCard` üzerinde formül dökümü, hipoglisemi bloğu (< 70 mg/dL), keton ve acil hekim uyarıları.
+    - Doğrulanmamış gıda ("Paket etiketini kontrol ettim") zorunlu onay kutusu.
+    - "Uyguladım ve Günlüğe Kaydet" butonu ile salt ekleme (append-only) `logAppliedDose` kaydı ve tabağın boşaltılması.
+  - Test Sonuçları:
+    - `dose_flow_test.dart` (reşit olmama güvenlik kilitlemesi ve tam doz hesaplama akışı) başarıyla geçti.
+    - 14 mobil test %100 yeşil, `flutter analyze` 0 hata.
