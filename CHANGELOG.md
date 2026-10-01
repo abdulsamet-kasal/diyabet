@@ -17,3 +17,4 @@ Tüm önemli değişiklikler bu dosyada kronolojik olarak listelenir.
 - Faz 6: Glikoz günlüğü, Time-in-Range (TIR) hesaplayıcı ve hekim için profesyonel PDF klinik rapor dışa aktarma modülü tamamlandı.
 - Faz 7: Hipoglisemi acil yardım kartı (15-15 kuralı sayacı, 112 doğrudan arama, acil yakını hızlı arama, glukagon talimatı), 8 makalelik klinik eğitim modülü (taslak banner ve resmi kılavuz atıfları) ve yerel ölçüm/enjeksiyon hatırlatıcıları tamamlandı.
 - Faz 8: Biyometrik kilit (local_auth 3.x), güvenli anahtar depolama (flutter_secure_storage), çevrimdışı öncelikli Supabase senkronizasyonu, KVKK/GDPR yapılandırılmış JSON veri dışa aktarma ve geri dönüşsüz hesap/sağlık verisi silme (hard delete) tamamlandı.
+- Faz 9: Production sample-veri filtresi, 52/52 CI test doğrulaması, Gradle 1.5GB bellek limitli Android release APK derlemesi ve GitHub Release v1.0.0 dağıtımı tamamlandı.

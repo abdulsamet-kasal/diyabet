@@ -19,7 +19,10 @@ final databaseProvider = Provider<AppDatabase>((ref) {
 // Repositories
 final foodRepositoryProvider = Provider<FoodRepository>((ref) {
   final db = ref.watch(databaseProvider);
-  return FoodRepository(db: db, isReleaseMode: false);
+  return FoodRepository(
+    db: db,
+    isReleaseMode: const bool.fromEnvironment('dart.vm.product'),
+  );
 });
 
 final settingsRepositoryProvider = Provider<TherapySettingsRepository>((ref) {

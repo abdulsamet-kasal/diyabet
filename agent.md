@@ -26,7 +26,7 @@ Bu dosya, projede gerçekleştirilen tüm geliştirme adımlarını, fazları, t
 | **Faz 6** | Glikoz Günlüğü + Raporlar (PDF Dokümanı) | 🟢 Tamamlandı | Canlı ölçüm kaydı, Time-in-Range hesabı, Hekim PDF raporu oluşturma ve testler yeşil | `faz-6: glucose-reports` |
 | **Faz 7** | Eğitim İçeriği + Acil Durum (Hipoglisemi Kartı) + Hatırlatıcılar | 🟢 Tamamlandı | 21 testin tamamı yeşil, analyze 0 hata | `faz-7: education-emergency-reminders` |
 | **Faz 8** | Supabase Senkronizasyon + KVKK / Gizlilik + Biyometrik Kilit | 🟢 Tamamlandı | 25 testin tamamı yeşil, analyze 0 hata | `faz-8: sync-kvkk-security` |
-| **Faz 9** | Sertleştirme, Erişilebilirlik, Testler & APK Derleme/Yayınlama | ⚪ Bekliyor | - | - |
+| **Faz 9** | Sertleştirme, Erişilebilirlik, Testler & APK Derleme/Yayınlama | 🟢 Tamamlandı | %100 CI yeşil, Release APK derlendi & GitHub'a yüklendi | `v1.0.0` (Release) |
 
 ---
 
@@ -203,3 +203,21 @@ Bu dosya, projede gerçekleştirilen tüm geliştirme adımlarını, fazları, t
     - `phase8_test.dart` ile 4 yeni test eklendi (JSON Export yapısı, Offline Sync davranışı, Hard Delete sıfırlama, SecurityService).
     - Toplam 25 mobil test %100 yeşil.
     - `flutter analyze` 0 hata.
+
+### [Faz 9] - Sertleştirme, Doğrulama & APK Derleme/Yayınlama
+- **Tarih:** 2026-10-01
+- **Yapılanlar:**
+  - Kalite & Sertleştirme:
+    - `FoodRepository` için production modunda `const bool.fromEnvironment('dart.vm.product')` ile `is_sample: true` kayıtlarının filtrelenmesi sağlandı (Definition of Done gereksinimi).
+    - AndroidManifest.xml üzerinde `GlikoRehber` adı, internet, biyometrik izinleri ve doğrudan telefon arama (`tel:`) intent'leri eklendi.
+    - `CLINICAL_REVIEW_CHECKLIST.md` ve `docs/REGULATORY_NOTES.md` kontrol listeleri tamamlandı.
+  - CI & Test Doğrulaması:
+    - `scripts/ci.sh` çalıştırıldı: `packages/dose_engine` 27 testi ve `apps/mobile` 25 testi dahil olmak üzere toplam **52 testin tamamı %100 yeşil** geçti.
+    - `flutter analyze` ve `dart analyze` sıfır hata ile tamamlandı.
+  - Android APK Derleme:
+    - Donanım ve Gradle bellek limitlerine tam riayet edildi:
+      `org.gradle.jvmargs=-Xmx1280M -XX:MaxMetaspaceSize=512M -XX:ReservedCodeCacheSize=256m -XX:+UseG1GC`
+    - CachyOS 8GB RAM hostunda OOM yaşanmadan `flutter build apk --release` başarıyla tamamlandı (66 MB release APK).
+  - GitHub Dağıtımı & Release:
+    - GitHub Release `v1.0.0` oluşturuldu: `https://github.com/abdulsamet-kasal/diyabet/releases/tag/v1.0.0`
+    - Derlenen `app-release.apk` dosyası doğrudan release asset olarak yüklendi ve kullanıcının erişimine sunuldu.
