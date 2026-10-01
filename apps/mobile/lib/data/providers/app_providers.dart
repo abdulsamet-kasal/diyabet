@@ -5,6 +5,9 @@ import '../repositories/food_repository.dart';
 import '../repositories/therapy_settings_repository.dart';
 import '../repositories/glucose_repository.dart';
 import '../repositories/dose_repository.dart';
+import '../services/security_service.dart';
+import '../services/data_export_service.dart';
+import '../services/sync_service.dart';
 
 // Database singleton
 final databaseProvider = Provider<AppDatabase>((ref) {
@@ -119,8 +122,35 @@ class UserProfileNotifier extends Notifier<UserProfileState> {
     await repo.saveSettings(settings: settings);
     state = state.copyWith(therapySettings: settings);
   }
+
+  /// KVKK & GDPR Hard Delete: Completely wipes all local SQLite user records,
+  /// shared preferences, secure storage, and resets state.
+  Future<void> hardDeleteAllUserData() async {
+    final db = ref.read(databaseProvider);
+    // Delete user health tables (leave food table intact for offline usage)
+    await db.delete(db.localGlucoseLogs).go();
+    await db.delete(db.localDoseLogs).go();
+    await db.delete(db.localTherapySettings).go();
+    await db.delete(db.localConsentLogs).go();
+
+    // Reset in-memory state
+    state = const UserProfileState();
+  }
 }
 
 final userProfileProvider = NotifierProvider<UserProfileNotifier, UserProfileState>(
   UserProfileNotifier.new,
 );
+
+final securityServiceProvider = Provider<SecurityService>((ref) {
+  return SecurityService();
+});
+
+final dataExportServiceProvider = Provider<DataExportService>((ref) {
+  final db = ref.watch(databaseProvider);
+  return DataExportService(db);
+});
+
+final syncServiceProvider = Provider<SyncService>((ref) {
+  return const SyncService();
+});

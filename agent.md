@@ -25,7 +25,7 @@ Bu dosya, projede gerçekleştirilen tüm geliştirme adımlarını, fazları, t
 | **Faz 5** | Öğün Oluşturucu + Doz Hesaplama Ekranı & Doz Logu | 🟢 Tamamlandı | Tabak yönetimi, profil kilidi, IOB düşümü, append-only loglama ve widget testleri yeşil | `faz-5: meal-dose` |
 | **Faz 6** | Glikoz Günlüğü + Raporlar (PDF Dokümanı) | 🟢 Tamamlandı | Canlı ölçüm kaydı, Time-in-Range hesabı, Hekim PDF raporu oluşturma ve testler yeşil | `faz-6: glucose-reports` |
 | **Faz 7** | Eğitim İçeriği + Acil Durum (Hipoglisemi Kartı) + Hatırlatıcılar | 🟢 Tamamlandı | 21 testin tamamı yeşil, analyze 0 hata | `faz-7: education-emergency-reminders` |
-| **Faz 8** | Supabase Senkronizasyon + KVKK / Gizlilik + Biyometrik Kilit | ⚪ Bekliyor | - | - |
+| **Faz 8** | Supabase Senkronizasyon + KVKK / Gizlilik + Biyometrik Kilit | 🟢 Tamamlandı | 25 testin tamamı yeşil, analyze 0 hata | `faz-8: sync-kvkk-security` |
 | **Faz 9** | Sertleştirme, Erişilebilirlik, Testler & APK Derleme/Yayınlama | ⚪ Bekliyor | - | - |
 
 ---
@@ -182,3 +182,24 @@ Bu dosya, projede gerçekleştirilen tüm geliştirme adımlarını, fazları, t
     - `phase7_test.dart` ile 6 yeni test yazıldı.
     - Toplam 21 mobil test %100 yeşil.
     - `flutter analyze` 0 hata/uyarı (Flutter 3.47+ deprecation temiz).
+
+### [Faz 8] - Supabase Senkronizasyon, KVKK & Güvenlik
+- **Tarih:** 2026-10-01
+- **Yapılanlar:**
+  - `SecurityService`:
+    - `flutter_secure_storage` ile hassas token ve biyometrik kilit durumunun güvenli saklanması.
+    - `local_auth 3.x` API entegrasyonu: Biyometrik kimlik doğrulama (Parmak İzi / Yüz Tanıma) veya PIN/Desen kilit desteği.
+    - `SettingsScreen` üzerinde Biyometrik Kilit açma/kapama seçeneği.
+  - `DataExportService` (KVKK Madde 11 & GDPR Article 20 - Veri Taşınabilirliği):
+    - Kullanıcının profilini, açık rıza loglarını, terapi ayar geçmişini, glikoz ölçümlerini ve append-only doz kütüklerini standart JSON formatında derleyen dışa aktarma servisi.
+    - JSON görüntüleyici ve tek tıkla panoya kopyalama arayüzü.
+  - `SyncService` (Çevrimdışı Öncelikli Supabase Senkronizasyonu):
+    - Supabase bağlantı kontrolü.
+    - Çevrimdışı modda yerel SQLite güvenliği ve internet geldiğinde `glucose_logs`, `meal_logs` ve salt ekleme `dose_logs` tablolarını bulutla eşitleyen kuyruk mimarisi.
+  - Unutulma Hakkı & Kalıcı Veri Silme (`hardDeleteAllUserData`):
+    - Tek tıkla yerel SQLite tablolarındaki tüm kişisel sağlık kayıtlarını (glikoz, doz, terapi ayarları, rıza) geri dönüşsüz olarak silme.
+    - Çift onaylı modal diyalog ve güvenli depolama / önbellek temizliği sonrası Onboarding akışına yönlendirme.
+  - Test Sonuçları:
+    - `phase8_test.dart` ile 4 yeni test eklendi (JSON Export yapısı, Offline Sync davranışı, Hard Delete sıfırlama, SecurityService).
+    - Toplam 25 mobil test %100 yeşil.
+    - `flutter analyze` 0 hata.

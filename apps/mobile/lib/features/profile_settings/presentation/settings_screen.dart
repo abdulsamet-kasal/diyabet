@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:dose_engine/dose_engine.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/numeric_field.dart';
@@ -24,13 +26,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _allowNegativeCorrection = false;
   bool _subtractFiber = false;
   bool _confirmedWithClinician = false;
+  bool _biometricLockEnabled = false;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _initValues());
   }
 
-  void _initValues() {
+  Future<void> _initValues() async {
     final profile = ref.read(userProfileProvider);
     final settings = profile.therapySettings;
     if (settings != null) {
@@ -44,7 +48,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       _subtractFiber = settings.subtractFiber;
       _confirmedWithClinician = settings.confirmedWithClinician;
     }
-    setState(() {});
+    final security = ref.read(securityServiceProvider);
+    final bioEnabled = await security.isBiometricLockEnabled();
+    if (mounted) {
+      setState(() {
+        _biometricLockEnabled = bioEnabled;
+      });
+    }
   }
 
   @override
@@ -84,6 +94,154 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Terapi ayarları başarıyla güncellendi.')),
       );
+    }
+  }
+
+  Future<void> _toggleBiometricLock(bool value) async {
+    final security = ref.read(securityServiceProvider);
+    if (value) {
+      final authenticated = await security.authenticate(
+        reason: 'Biyometrik kilidi aktif etmek için doğrulayınız.',
+      );
+      if (!authenticated) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Kimlik doğrulanamadı. Biyometrik kilit açılmadı.')),
+          );
+        }
+        return;
+      }
+    }
+    await security.setBiometricLockEnabled(value);
+    setState(() => _biometricLockEnabled = value);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(value
+              ? 'Biyometrik kilit koruması aktif edildi.'
+              : 'Biyometrik kilit devre dışı bırakıldı.'),
+        ),
+      );
+    }
+  }
+
+  Future<void> _exportData() async {
+    final profile = ref.read(userProfileProvider);
+    final exportService = ref.read(dataExportServiceProvider);
+
+    final jsonStr = await exportService.exportToJsonString(
+      diabetesType: profile.diabetesType,
+      glucoseUnit: profile.glucoseUnit.name,
+      usesSyringe: profile.usesSyringe,
+    );
+
+    if (!mounted) return;
+
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('KVKK / GDPR Veri Paketi (JSON)'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Tüm profil, ölçüm ve doz kütükleriniz yapılandırılmış JSON biçiminde hazırlandı:',
+                style: TextStyle(fontSize: 12),
+              ),
+              const SizedBox(height: 10),
+              Container(
+                height: 200,
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                child: SingleChildScrollView(
+                  child: SelectableText(
+                    jsonStr,
+                    style: const TextStyle(fontFamily: 'monospace', fontSize: 11),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: jsonStr));
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Veri paketi panoya kopyalandı.')),
+              );
+            },
+            child: const Text('Panoya Kopyala'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Kapat'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _syncCloud() async {
+    final db = ref.read(databaseProvider);
+    final syncService = ref.read(syncServiceProvider);
+
+    final res = await syncService.syncAll(db: db);
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(res.message),
+        backgroundColor: res.isSuccess ? AppTheme.glucoseTarget : Colors.orange.shade800,
+      ),
+    );
+  }
+
+  Future<void> _hardDeleteAccountAndData() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Tüm Verileri ve Hesabı Kalıcı Olarak Sil?'),
+        content: const Text(
+          'DİKKAT: Bu işlem tüm glikoz ölçümlerinizi, insülin doz kütüklerinizi, hekim ayarlarınızı ve cihazdaki güvenlik anahtarlarını GERİ DÖNÜŞSÜZ olarak siler.\n\nEmin misiniz?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Vazgeç'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.glucoseSevere),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('EVET, KALICI OLARAK SİL', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      final notifier = ref.read(userProfileProvider.notifier);
+      await notifier.hardDeleteAllUserData();
+
+      final security = ref.read(securityServiceProvider);
+      await security.clearAllSecureData();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Tüm kişisel verileriniz ve ayarlarınız başarıyla sıfırlandı.'),
+          ),
+        );
+        context.go('/onboarding');
+      }
     }
   }
 
@@ -236,44 +394,52 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             const Divider(height: 36),
 
-            // KVKK & Privacy actions
-            const Text('Gizlilik ve Veri Yönetimi (KVKK)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            // Security & Biometric Lock Section
+            const Text('Güvenlik ve Biyometrik Koruma', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(height: 8),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Biyometrik Kilit (Parmak İzi / Yüz Tanıma)'),
+              subtitle: const Text('Hassas sağlık ve insülin doz verilerinizi korumak için doğrulama zorunlu kılınsın.'),
+              value: _biometricLockEnabled,
+              onChanged: _toggleBiometricLock,
+            ),
+            const Divider(height: 28),
+
+            // Supabase Cloud Sync Section
+            const Text('Bulut Senkronizasyonu (Supabase)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 8),
             ListTile(
-              leading: const Icon(Icons.download),
+              contentPadding: EdgeInsets.zero,
+              leading: const CircleAvatar(
+                backgroundColor: AppTheme.primaryTeal,
+                child: Icon(Icons.cloud_sync, color: Colors.white),
+              ),
+              title: const Text('Çevrimdışı Öncelikli Senkronizasyon'),
+              subtitle: const Text('Ölçüm ve doz kayıtlarınızı güvenli bulut sunucusuna senkronize edin.'),
+              trailing: OutlinedButton(
+                onPressed: _syncCloud,
+                child: const Text('Eşitle'),
+              ),
+            ),
+            const Divider(height: 28),
+
+            // KVKK & Privacy actions
+            const Text('Gizlilik ve Veri Yönetimi (KVKK / GDPR)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(height: 8),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.file_download_outlined, color: AppTheme.primaryTeal),
               title: const Text('Tüm Verilerimi Dışa Aktar (JSON)'),
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Veri paketi hazırlanıyor...')),
-                );
-              },
+              subtitle: const Text('KVKK Madde 11 uyarınca profil, ayar, glikoz ve doz kütüklerinizi indirin.'),
+              onTap: _exportData,
             ),
             ListTile(
-              leading: const Icon(Icons.delete_forever, color: AppTheme.glucoseLow),
-              title: const Text('Tüm Verilerimi ve Hesabımı Kalıcı Olarak Sil', style: TextStyle(color: AppTheme.glucoseLow)),
-              onTap: () {
-                showDialog<void>(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    title: const Text('Hesap ve Veri Silme'),
-                    content: const Text(
-                      'Tüm sağlık kayıtlarınız, glikoz ölçümleriniz ve terapi ayarlarınız cihazdan ve sunucudan kalıcı olarak silinecektir. Bu işlem geri alınamaz.',
-                    ),
-                    actions: [
-                      TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Vazgeç')),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(ctx);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Tüm yerel veriler kalıcı olarak silindi.')),
-                          );
-                        },
-                        child: const Text('Kalıcı Olarak Sil', style: TextStyle(color: AppTheme.glucoseLow)),
-                      ),
-                    ],
-                  ),
-                );
-              },
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.delete_forever, color: AppTheme.glucoseSevere),
+              title: const Text('Tüm Verilerimi ve Hesabımı Kalıcı Olarak Sil', style: TextStyle(color: AppTheme.glucoseSevere)),
+              subtitle: const Text('Unutulma hakkı: Tüm yerel SQLite verilerini ve ayarları temizler.'),
+              onTap: _hardDeleteAccountAndData,
             ),
           ],
         ),
