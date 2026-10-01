@@ -23,7 +23,7 @@ Bu dosya, projede gerçekleştirilen tüm geliştirme adımlarını, fazları, t
 | **Faz 3** | Tasarım Sistemi + Onboarding + Terapi Ayarları | 🟢 Tamamlandı | Tüm WCAG AA bileşenleri, Riverpod NotifierProvider ve testler yeşil | `faz-3: design-onboarding` |
 | **Faz 4** | Besin Modülü (Arama/FTS, Detay, Porsiyonlar, Barkod, Doğrulama) | 🟢 Tamamlandı | Canlı arama, porsiyon/GI-GL hesabı, etiket ekleme ve barkod akışı tamamlandı | `faz-4: food-module` |
 | **Faz 5** | Öğün Oluşturucu + Doz Hesaplama Ekranı & Doz Logu | 🟢 Tamamlandı | Tabak yönetimi, profil kilidi, IOB düşümü, append-only loglama ve widget testleri yeşil | `faz-5: meal-dose` |
-| **Faz 6** | Glikoz Günlüğü + Raporlar (PDF Dokümanı) | ⚪ Bekliyor | - | - |
+| **Faz 6** | Glikoz Günlüğü + Raporlar (PDF Dokümanı) | 🟢 Tamamlandı | Canlı ölçüm kaydı, Time-in-Range hesabı, Hekim PDF raporu oluşturma ve testler yeşil | `faz-6: glucose-reports` |
 | **Faz 7** | Eğitim İçeriği + Acil Durum (Hipoglisemi Kartı) + Hatırlatıcılar | ⚪ Bekliyor | - | - |
 | **Faz 8** | Supabase Senkronizasyon + KVKK / Gizlilik + Biyometrik Kilit | ⚪ Bekliyor | - | - |
 | **Faz 9** | Sertleştirme, Erişilebilirlik, Testler & APK Derleme/Yayınlama | ⚪ Bekliyor | - | - |
@@ -133,3 +133,22 @@ Bu dosya, projede gerçekleştirilen tüm geliştirme adımlarını, fazları, t
   - Test Sonuçları:
     - `dose_flow_test.dart` (reşit olmama güvenlik kilitlemesi ve tam doz hesaplama akışı) başarıyla geçti.
     - 14 mobil test %100 yeşil, `flutter analyze` 0 hata.
+
+### [Faz 6] - Glikoz Günlüğü & Hekim PDF Raporu
+- **Tarih:** 2026-10-01
+- **Yapılanlar:**
+  - `GlucoseLogScreen`:
+    - Açlık, tokluk, gece ve egzersiz bağlamlarıyla hızlı ölçüm girişi.
+    - Anlık Time-in-Range (70-180 mg/dL) başarı çubuğu.
+    - `GlucoseChip` ile renk körlüğüne duyarlı ölçüm geçmişi listesi.
+  - `ReportsScreen` & `PdfReportService`:
+    - `pdf` ve `printing` paketleri entegre edildi.
+    - Hekim için kapsamlı PDF rapor oluşturucu:
+      - Hasta diyabet tipi ve birim bilgisi.
+      - Aktif ICR, ISF, Hedef glikoz, DIA ve doz adımı tablosu.
+      - Time-in-Range yüzdesi ve ölçüm dağılımı.
+      - Son 15 glikoz ölçümü ve uygulanan son 15 insülin dozu tablosu.
+      - Yasal sorumluluk ve klinik inceleme uyarısı.
+  - Test Sonuçları:
+    - `pdf_report_test.dart` ile PDF byte üretimi başarıyla doğrulandı.
+    - 15 mobil test %100 yeşil, `flutter analyze` 0 hata.
